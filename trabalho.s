@@ -19,13 +19,14 @@ umull32:
     mov     pc, lr
 
     ; r1:r0 -> uint32_t nseed
+    ; return: uint32_t
 srand:
 
     push    r2
 
     ldr     r2, seed_addr ; r2 -> seed addr
     str     r0, [r2, #0] ; r0 -> low
-    str     r1, [r2, #2] ; r1 -> hi
+    str     r1, [r2, #2] ; r1 -> high
 
     pop     r2
 
@@ -73,7 +74,43 @@ rand:
     mov     pc, lr
 
 main:       ; código aplicacional
-    b       .
+    
+    ; error = r2
+    ; rand_number = r3
+    ; i = r4
+
+    ; error = r2 = 0
+    mov     r2,#0
+
+    ; r1:r0 -> 5423 = 0x152F
+    mov     r0,#0x2f
+    movt    r0,#0x15
+    mov     r1,#0x00
+    movt    r1,#0x00
+
+    ;bl not working idk why
+    mov     r3,pc
+    add     r14,r3,#4
+    b       srand
+
+    ; i = r4 = 0
+    mov     r4,#0
+
+for_loop:
+
+    ; error = 0
+    cmp     r2,#0
+    bne     for_end
+
+    ; i < N
+    cmp     r4,N
+    bhs     for_end
+
+
+
+for_end:
+
+    b       .    
 
 result_addr:
     .word   result
