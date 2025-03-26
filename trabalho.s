@@ -23,86 +23,100 @@ umull32:
     push r6
     push r7
     push r8
+    push r9
 
-    ; i -> r4 = 0
+    ; i -> r6 = 0
+    mov     r6, #0
+
+    ; p -> r3:r2:r5:r4
     mov     r4, #0
-
-    ; p -> r2:r3:r4:r5
     mov     r5, #0
-    mov     r4, #0
     ; mov     r2, r2
     ; mov     r3, r3
 
-    ; last bit (p_1) -> r6
-    mov     r6, #0
+    ; last bit (p_1) -> r7
+    mov     r7, #0
 
 umull32_for:
     ; -- condition --
     ; i >= 32
-    mov     r7, #32
-    cmp     r4, r7
+    mov     r9, #32
+    cmp     r6, r9
     bhs     umull32_for_end
     ; -- body --
     
-    ; current bit -> r7
-    mov     r8, #1
-    and     r7, r2, r8
+    ; current bit -> r8
+    mov     r9, #1
+    and     r8, r2, r9
 
 umull32_if1:
 
     ; current bit != 0
-    mov     r8, #0
-    cmp     r7, r8
+    mov     r9, #0
+    cmp     r8, r9
     bne     umull32_if2
     
     ; lastBit != 1
-    mov     r8, #1
-    cmp     r6, r8
+    mov     r9, #1
+    cmp     r7, r9
     bne     umull32_if2
     
     ; p += M << 32
-    add     r3,r3,r1
-    adc     r2,r2,r0     
+    add     r2,r2,r0
+    adc     r3,r3,r1     
     
 umull32_if2:
 
     ; current bit != 1
-    mov     r8, #1
-    cmp     r7, r8
+    mov     r9, #1
+    cmp     r8, r9
     bne     umull32_if_end
 
     ; lastBit != 0
-    mov     r8, #0
-    cmp     r6, r8
+    mov     r9, #0
+    cmp     r7, r9
     bne     umull32_if_end
 
     ; p -= M << 32;
-    sub     r3,r3,r1
-    sbc     r2,r2,r0  
+    sub     r2,r2,r0 
+    sbc     r3,r3,r1  
     
 
 umull32_if_end:
 
     ; last bit = current bit
-    mov     r6, r7
+    mov     r7, r8
 
     ; p >>= 1
+    mov     r9, #0
 
-    ; 
+    lsr     r3, r3, #1
+    adc     r2, r2, r9
+
+    lsr     r2, r2, #1
+    adc     r5, r5, r9
+
+    lsr     r5, r5, #1
+    adc     r4, r4, r9
+
+    asr     r4, r4, #1
 
     ; -- increment --
-    add     r4, r4, #1
+    add     r6, r6, #1
     b       umull32_for
-
 
 umull32_for_end:
 
-    ; TODO: pop
+    ; return p
+    mov     r0,r2
+    mov     r1,r3
+    
     pop r4
     pop r5
     pop r6
     pop r7
     pop r8
+    pop r9
 
     mov     pc, lr
 
