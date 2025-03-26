@@ -75,43 +75,56 @@ rand:
 
 main:       ; código aplicacional
     
-    ; error = r2
-    ; rand_number = r3
-    ; i = r4
-
-    ; error = r2 = 0
-    mov     r2,#0
+    ; error -> r2
+    mov     r2, #0
+    ; i -> r4
 
     ; r1:r0 -> 5423 = 0x152F
-    mov     r0,#0x2f
-    movt    r0,#0x15
-    mov     r1,#0x00
-    movt    r1,#0x00
-
-    ;bl not working idk why
-    mov     r3,pc
-    add     r14,r3,#4
-    b       srand
+    mov     r0, #0x2F
+    movt    r0, #0x15
+    mov     r1, #0x00
+    movt    r1, #0x00
+    bl      srand
 
     ; i = r4 = 0
-    mov     r4,#0
+    mov     r4, #0
 
 for_loop:
-
-    ; error = 0
-    cmp     r2,#0
+    ; -- condition --
+    ; error != 0
+    mov     r5, #0
+    cmp     r2, r5
     bne     for_end
-
-    ; i < N
-    cmp     r4,N
+    ; i >= N
+    ldr     r5, n_addr
+    cmp     r4, r5
     bhs     for_end
+    ; -- for body --
 
+    ; rand_number -> r0
+    bl      rand
 
+    ; rand_number == result[i]
+    ldr     r5, result_addr
+    ldr     r7, [r5, r4]
+    cmp     r0, r7
+    beq     if_end
+    
+    ; error = 1
+    mov     r2, #1
+if_end:
+
+    ; i++
+    add     r4, r4, #1
+    b       for_loop
 
 for_end:
 
+    mov     r0, #0
     b       .    
 
+n_addr:
+    .word   N
 result_addr:
     .word   result
 seed_addr:
