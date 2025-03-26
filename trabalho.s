@@ -16,10 +16,57 @@ stack_top_addr:
     ; r3:r2 -> uint32_t m
     ; return: uint32_t
 umull32:
+
+    ; TODO: push    
+
+    ; i -> r4 = 0
+    mov     r4, #0
+
+    ; push M_ext
+    push    
+    
+    ; vou para a aula de apoio mas 
+    ; deixo o pc ligado tho
+    ; vou tentar cozinhar alguma coisa aqui
+    ; ac, para fazer companhia ao simao e nobre+
+
+umull32_for:
+    ; -- condition --
+    ; i >= 32
+    mov     r5, #32
+    cmp     r4, r5
+    bhs     umull32_for_end
+    ; -- body --
+    ; r0:r1:r2:r3 -> M_ext 
+    ; (p & 0x1) -> r6??? 
+    
+
+
+umull32_if1:
+    ; (p & 0x1) != 0 || p_1 != 1
+    
+    
+umull32_if2:
+    ; (p & 0x1) != 1 || p_1 != 0
+
+umull32_if_end:
+
+
+
+    ; -- increment --
+    add     r4, r4, #1
+    b       umull32_for
+
+
+umull32_for_end:
+
+    ; TODO: pop
+
     mov     pc, lr
 
     ; r1:r0 -> uint32_t nseed
     ; return: uint32_t
+    
 srand:
 
     push    r2
@@ -77,7 +124,6 @@ main:       ; código aplicacional
     
     ; error -> r2
     mov     r2, #0
-    ; i -> r4
 
     ; r1:r0 -> 5423 = 0x152F
     mov     r0, #0x2F
@@ -86,20 +132,20 @@ main:       ; código aplicacional
     movt    r1, #0x00
     bl      srand
 
-    ; i = r4 = 0
+    ; i -> r4 = 0
     mov     r4, #0
 
-for_loop:
+main_for:
     ; -- condition --
     ; error != 0
     mov     r5, #0
     cmp     r2, r5
-    bne     for_end
+    bne     main_for_end
     ; i >= N
     ldr     r5, n_addr
     cmp     r4, r5
-    bhs     for_end
-    ; -- for body --
+    bhs     main_for_end
+    ; -- body --
 
     ; rand_number -> r0
     bl      rand
@@ -108,17 +154,17 @@ for_loop:
     ldr     r5, result_addr
     ldr     r7, [r5, r4]
     cmp     r0, r7
-    beq     if_end
+    beq     main_if_end
     
     ; error = 1
     mov     r2, #1
-if_end:
+main_if_end:
 
-    ; i++
+    ; -- increment --
     add     r4, r4, #1
-    b       for_loop
+    b       main_for
 
-for_end:
+main_for_end:
 
     mov     r0, #0
     b       .    
