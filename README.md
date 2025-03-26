@@ -32,6 +32,32 @@ uint32_t umull32(uint32_t M, uint32_t m){
     return p;
 }
 
+uint32_t umull32Melhorado(uint32_t M, uint32_t m){
+
+    int64_t p = m;
+    uint8_t lastBit = 0;
+
+    // acho que isto é a mesma merda mas kinda mais facil
+
+    // ir por cada bit
+    for(uint16_t i = 0; i < 32; i++){
+
+        uint8_t currBit = p & 0x1
+
+        if(currBit == 0 && lastBit == 1){
+            p += M << 32;
+        }else if(currBit == 1 && lastBit == 0){
+            p -= M << 32;
+        }
+
+        lastBit = currBit;
+    	p >>= 1;
+
+    }
+
+    return p;
+}
+
 // modifica a variável global
 void srand(uint32_t nseed){
     seed = nseed;
@@ -53,14 +79,14 @@ int main(void){
 
     // inicializar seed
     srand(5423);
-    
+
     // verificar números random
     // para se houver um nº inesperado
     for(i = 0; error == 0 && i < N; i++){
-        
+
         // obter nº aleatório
         rand_number = rand();
-        
+
         // verificar se é inesperado
         if(rand_number != result[i]){
             error = 1;

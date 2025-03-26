@@ -18,40 +18,77 @@ stack_top_addr:
 umull32:
 
     ; TODO: push    
+    push r4
+    push r5
+    push r6
+    push r7
+    push r8
 
     ; i -> r4 = 0
     mov     r4, #0
 
-    ; push M_ext
-    push    
-    
-    ; vou para a aula de apoio mas 
-    ; deixo o pc ligado tho
-    ; vou tentar cozinhar alguma coisa aqui
-    ; ac, para fazer companhia ao simao e nobre+
+    ; p -> r2:r3:r4:r5
+    mov     r5, #0
+    mov     r4, #0
+    ; mov     r2, r2
+    ; mov     r3, r3
+
+    ; last bit (p_1) -> r6
+    mov     r6, #0
 
 umull32_for:
     ; -- condition --
     ; i >= 32
-    mov     r5, #32
-    cmp     r4, r5
+    mov     r7, #32
+    cmp     r4, r7
     bhs     umull32_for_end
     ; -- body --
-    ; r0:r1:r2:r3 -> M_ext 
-    ; (p & 0x1) -> r6??? 
     
-
+    ; current bit -> r7
+    mov     r8, #1
+    and     r7, r2, r8
 
 umull32_if1:
-    ; (p & 0x1) != 0 || p_1 != 1
+
+    ; current bit != 0
+    mov     r8, #0
+    cmp     r7, r8
+    bne     umull32_if2
     
+    ; lastBit != 1
+    mov     r8, #1
+    cmp     r6, r8
+    bne     umull32_if2
+    
+    ; p += M << 32
+    add     r3,r3,r1
+    adc     r2,r2,r0     
     
 umull32_if2:
-    ; (p & 0x1) != 1 || p_1 != 0
+
+    ; current bit != 1
+    mov     r8, #1
+    cmp     r7, r8
+    bne     umull32_if_end
+
+    ; lastBit != 0
+    mov     r8, #0
+    cmp     r6, r8
+    bne     umull32_if_end
+
+    ; p -= M << 32;
+    sub     r3,r3,r1
+    sbc     r2,r2,r0  
+    
 
 umull32_if_end:
 
+    ; last bit = current bit
+    mov     r6, r7
 
+    ; p >>= 1
+
+    ; 
 
     ; -- increment --
     add     r4, r4, #1
@@ -61,6 +98,11 @@ umull32_if_end:
 umull32_for_end:
 
     ; TODO: pop
+    pop r4
+    pop r5
+    pop r6
+    pop r7
+    pop r8
 
     mov     pc, lr
 
