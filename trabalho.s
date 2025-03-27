@@ -24,9 +24,19 @@ umull32:
     push r7
     push r8
     push r9
+    push r10
 
     ; i -> r6 = 0
     mov     r6, #0
+
+    /*
+    r0 -> M low
+    r1 -> M high
+    p -> r3:r2:r5:r4
+    i -> r6
+    last bit (p_1) -> r7
+    r8 -> current bit
+    */
 
     ; p -> r3:r2:r5:r4
     mov     r4, #0
@@ -49,11 +59,14 @@ umull32_for:
     mov     r9, #1
     and     r8, r2, r9
 
+    mov     r10,r6 ; valor de i em r10
+    mov     r6,r8  ; valor de current bit no r6(i)
+
 umull32_if1:
 
     ; current bit != 0
     mov     r9, #0
-    cmp     r8, r9
+    cmp     r6, r9
     bne     umull32_if2
     
     ; lastBit != 1
@@ -69,7 +82,7 @@ umull32_if2:
 
     ; current bit != 1
     mov     r9, #1
-    cmp     r8, r9
+    cmp     r6, r9
     bne     umull32_if_end
 
     ; lastBit != 0
@@ -84,22 +97,26 @@ umull32_if2:
 
 umull32_if_end:
 
+    mov     r8,r6 ; valor de current bit volta para a var original
+    mov     r6,r10  ; valor de i volta para var original
+
     ; last bit = current bit
     mov     r7, r8
 
     ; p >>= 1
+    ; p -> r3:r2:r5:r4
     mov     r9, #0
 
-    lsr     r3, r3, #1
-    adc     r2, r2, r9
-
-    lsr     r2, r2, #1
+    lsr     r4, r4, #1
     adc     r5, r5, r9
 
     lsr     r5, r5, #1
-    adc     r4, r4, r9
+    adc     r2, r2, r9
 
-    asr     r4, r4, #1
+    lsr     r2, r2, #1
+    adc     r3, r3, r9
+
+    asr     r3, r3, #1
 
     ; -- increment --
     add     r6, r6, #1
@@ -117,6 +134,7 @@ umull32_for_end:
     pop r7
     pop r8
     pop r9
+    pop r10
 
     mov     pc, lr
 
