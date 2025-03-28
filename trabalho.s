@@ -105,8 +105,12 @@ umull32_if_end:
 
     ; p >>= 1
     ; p -> r3:r2:r5:r4
-    mov     r9, #0
 
+    asr     r3,r3,#1
+    rrx     r2,r2
+    rrx     r5,r5
+    rrx     r4,r4
+    /*
     lsr     r4, r4, #1
     adc     r5, r5, r9
 
@@ -117,6 +121,7 @@ umull32_if_end:
     adc     r3, r3, r9
 
     asr     r3, r3, #1
+    */
 
     ; -- increment --
     add     r6, r6, #1
