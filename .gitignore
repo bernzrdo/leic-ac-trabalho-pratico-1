@@ -1,3 +1,5 @@
 *.hex
 *.lst
 shift-test.s
+tests2.s
+tests.s
