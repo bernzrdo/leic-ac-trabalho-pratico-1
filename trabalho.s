@@ -143,8 +143,8 @@ umull32_for_end:
 
     ; p -> r2:r3:r4:r5 -> NOVO
     ; return p
-    mov     r0,r3
-    mov     r1,r2
+    mov     r0,r5
+    mov     r1,r4
     
     pop r4
     pop r5
@@ -202,6 +202,12 @@ rand:
     ; r1:r0 + r3:r2 = r5:r4
     add     r4, r0, r2
     adc     r5, r1, r3
+
+    ; adicionar seed
+    ldr     r3, seed_addr ; r3 -> seed addr
+    str     r4, [r3, #0] ; low
+    str     r5, [r3, #2] ; high
+    
     
     ; r5:r4 >> 16 = r1:r0
     mov     r1, #0x00
@@ -218,6 +224,9 @@ main:       ; código aplicacional
     
     ; error -> r2
     mov     r2, #0
+
+    ; variavel para aceder a result[i]
+    mov     r3, #0
 
     ; r1:r0 -> 5423 = 0x152F
     mov     r0, #0x2F
@@ -246,7 +255,8 @@ main_for:
 
     ; rand_number == result[i]
     ldr     r5, result_addr
-    ldr     r7, [r5, r4]
+    add     r3, r4, r4 ; multiplica r3 por 2 para aceder ap result na posicao i
+    ldr     r7, [r5, r3]
     cmp     r0, r7
     beq     main_if_end
     
