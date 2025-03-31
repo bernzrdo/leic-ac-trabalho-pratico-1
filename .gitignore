@@ -1,3 +1,5 @@
+.vscode
 *.hex
 *.lst
+*.exe
 shift-test.s
