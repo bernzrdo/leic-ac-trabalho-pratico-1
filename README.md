@@ -97,3 +97,36 @@ int main(void){
     return 0;
 }
 ```
+
+## Perguntas
+
+1. Considere a definição da função `umull32` que realiza a multiplicação de dois números naturais codificados com 32 bits, em que o parâmetro `M` corresponde ao multiplicando e o parâmetro `m` ao multiplicador.
+
+    **a)** Implemente a função `umull32`.
+
+    **b)** Indique, em número de bytes, a quantidade de memória de código ocupada por essa implementação. Justifique a sua resposta.
+
+    > Cada instrução é codificada em 16 bits. A nossa implementação do `umull32` contém 56 instruções ou seja ocupa 896 bits que é 112 bytes.
+
+2. Considere a definição da função `srand` que afeta a variável global `seed` com o valor de uma nova semente.
+
+    **a)** Implemente a definição da variável `seed`, definindo as secções necessárias. Justifique a sua resposta.
+
+    > Para definir a variável global `seed` de 32 bits, na secção `.data`(pois a secção `.data` é destinada a variáveis globais iniciadas ou não) colocamos a label `seed` e implementamos a diretiva `.word 0x0001, 0x0000`. A razão para implementar essas duas words (16 bits cada) é devido à `seed` necessitar de 32 bits no qual, a primeira word representa a parte baixa da variável seed e a segunda a parte alta.
+    > Depois colocamos a label `seed_addr` na secção `.text` para que o código tenha acesso ao endereço da `seed`.
+
+    **b)** Implemente a função `srand`.
+
+3. Considere a definição da função `rand` que implementa um gerador congruencial linear (do Inglês Linear Congruential Generator – LCG) para gerar números pseudo-aleatórios entre zero e `RAND_MAX`. A constante `RAND_MAX` corresponde ao maior valor possível de codificar numa variável com tipo `uint32_t`.
+
+    **a)** Indique duas possibilidades de implementação da constante `RAND_MAX` e discuta as suas vantagens e desvantagens quanto aos requisitos de memória.
+
+    > A implementação usada no nosso código é que o CPU simplesmente descarta qualquer overflow além de uint32_t devido à variável ser de 32 bits assim, o CPU na verdade, não precisa executar RAND_MAX porque a variável seed já está limitada a 32 bits. A vantagem é que o calculo é inteiramente feito em registos, sem usar a memória e como a operação é redundante o próprio compilador elimina a operação. A outra implementação seria usar 2 registos com o máximo valor possível de uint32_t(0xFFFF 0xFFFF) e comparar com se a seed seria maior. O problema desta implementação é que é usado no mínimo 2 registo para fazer uma operação redundante.
+
+    **b)** Implemente a função `rand`.
+
+4. Relativamente à definição da função `main`, indique, justificando, o registo que é preferível utilizar para implementar a variável error: `R0` ou `R5`.
+
+    > É preferível usar a variável error no `R5` pois, se usássemos o `R0` iria interferir na passagem de argumentos ao chamar uma função ou no retorno de uma.
+
+5. Implemente o programa apresentado na Listagem 1 usando a linguagem assembly do P16 e as implementações propostas nos exercícios 1, 2 e 3.

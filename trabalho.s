@@ -17,13 +17,13 @@ stack_top_addr:
     ; return: uint32_t
 umull32:
 
-    push r4
-    push r5
-    push r6
-    push r7
-    push r8
-    push r9
-    push r10
+    push    r4
+    push    r5
+    push    r6
+    push    r7
+    push    r8
+    push    r9
+    push    r10
 
     ; i -> r6 = 0
     mov     r6, #0
@@ -80,7 +80,7 @@ umull32_if1:
     
     ; p += M << 32
     add     r3,r3,r0
-    adc     r2,r2,r1     
+    adc     r2,r2,r1
 
     b       umull32_if_end
     
@@ -127,13 +127,13 @@ umull32_for_end:
     mov     r0,r5
     mov     r1,r4
     
-    pop r4
-    pop r5
-    pop r6
-    pop r7
-    pop r8
-    pop r9
-    pop r10
+    pop     r4
+    pop     r5
+    pop     r6
+    pop     r7
+    pop     r8
+    pop     r9
+    pop     r10
 
     mov     pc, lr
 
@@ -268,7 +268,7 @@ result:
 seed:
     .word   0x0001, 0x0000
     
-    .stack
+    .stack  
     .space  STACK_SIZE
 
 stack_top:
