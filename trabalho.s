@@ -17,7 +17,6 @@ stack_top_addr:
     ; return: uint32_t
 umull32:
 
-    ; TODO: push    
     push r4
     push r5
     push r6
@@ -38,19 +37,13 @@ umull32:
     r8 -> current bit
     */
 
-    ; p -> r3:r2:r5:r4
+    ; p -> r2:r3:r4:r5 
     
     mov     r4,r3
     mov     r5,r2
     mov     r3,#0
     mov     r2,#0
 
-    ; p -> r2:r3:r4:r5 -> NOVO
-
-    /*
-    mov     r4, #0
-    mov     r5, #0
-    */
     ; mais significativos
     ; mov     r2, r2
     ; mov     r3, r3
@@ -122,18 +115,6 @@ umull32_if_end:
     rrx     r3,r3
     rrx     r4,r4
     rrx     r5,r5
-    /*
-    lsr     r4, r4, #1
-    adc     r5, r5, r9
-
-    lsr     r5, r5, #1
-    adc     r2, r2, r9
-
-    lsr     r2, r2, #1
-    adc     r3, r3, r9
-
-    asr     r3, r3, #1
-    */
 
     ; -- increment --
     add     r6, r6, #1
@@ -283,6 +264,7 @@ seed_addr:
     .data   ; variáveis globais
 result:
     .word   17747, 2055, 3664, 15611, 9816
+    ;.word  17747, 2055, 3664, 48379, 9816 array certo para nao dar erro
 seed:
     .word   0x0001, 0x0000
     
