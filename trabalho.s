@@ -17,7 +17,6 @@ stack_top_addr:
     ; return: uint32_t
 umull32:
 
-    ; TODO: push    
     push r4
     push r5
     push r6
@@ -38,9 +37,14 @@ umull32:
     r8 -> current bit
     */
 
-    ; p -> r3:r2:r5:r4
-    mov     r4, #0
-    mov     r5, #0
+    ; p -> r2:r3:r4:r5 
+    
+    mov     r4,r3
+    mov     r5,r2
+    mov     r3,#0
+    mov     r2,#0
+
+    ; mais significativos
     ; mov     r2, r2
     ; mov     r3, r3
 
@@ -57,7 +61,7 @@ umull32_for:
     
     ; current bit -> r8
     mov     r9, #1
-    and     r8, r2, r9
+    and     r8, r5, r9
 
     mov     r10,r6 ; valor de i em r10
     mov     r6,r8  ; valor de current bit no r6(i)
@@ -75,8 +79,10 @@ umull32_if1:
     bne     umull32_if2
     
     ; p += M << 32
-    add     r2,r2,r0
-    adc     r3,r3,r1     
+    add     r3,r3,r0
+    adc     r2,r2,r1     
+
+    b       umull32_if_end
     
 umull32_if2:
 
@@ -91,10 +97,9 @@ umull32_if2:
     bne     umull32_if_end
 
     ; p -= M << 32;
-    sub     r2,r2,r0 
-    sbc     r3,r3,r1  
+    sub     r3,r3,r0 
+    sbc     r2,r2,r1  
     
-
 umull32_if_end:
 
     mov     r8,r6 ; valor de current bit volta para a var original
@@ -104,24 +109,12 @@ umull32_if_end:
     mov     r7, r8
 
     ; p >>= 1
-    ; p -> r3:r2:r5:r4
+    ; p -> r2:r3:r4:r5 -> NOVO
 
-    asr     r3,r3,#1
-    rrx     r2,r2
-    rrx     r5,r5
+    asr     r2,r2,#1
+    rrx     r3,r3
     rrx     r4,r4
-    /*
-    lsr     r4, r4, #1
-    adc     r5, r5, r9
-
-    lsr     r5, r5, #1
-    adc     r2, r2, r9
-
-    lsr     r2, r2, #1
-    adc     r3, r3, r9
-
-    asr     r3, r3, #1
-    */
+    rrx     r5,r5
 
     ; -- increment --
     add     r6, r6, #1
@@ -129,9 +122,10 @@ umull32_if_end:
 
 umull32_for_end:
 
+    ; p -> r2:r3:r4:r5 -> NOVO
     ; return p
-    mov     r0,r2
-    mov     r1,r3
+    mov     r0,r5
+    mov     r1,r4
     
     pop r4
     pop r5
@@ -151,8 +145,8 @@ srand:
     push    r2
 
     ldr     r2, seed_addr ; r2 -> seed addr
-    str     r0, [r2, #0] ; r0 -> low
-    str     r1, [r2, #2] ; r1 -> high
+    str     r0, [r2, #0] 
+    str     r1, [r2, #2] 
 
     pop     r2
 
@@ -176,7 +170,9 @@ rand:
     mov     r2, #0xFD
     movt    r2, #0x43
     
+    push    lr
     bl      umull32
+    pop     lr
     ; r1:r0 -> seed * 214013
 
     ; r3:r2 -> 2531011 = 0x269EC3
@@ -187,6 +183,12 @@ rand:
     ; r1:r0 + r3:r2 = r5:r4
     add     r4, r0, r2
     adc     r5, r1, r3
+
+    ; adicionar seed
+    ldr     r3, seed_addr ; r3 -> seed addr
+    str     r4, [r3, #0] ; low
+    str     r5, [r3, #2] ; high
+    
     
     ; r5:r4 >> 16 = r1:r0
     mov     r1, #0x00
@@ -203,6 +205,9 @@ main:       ; código aplicacional
     
     ; error -> r2
     mov     r2, #0
+
+    ; variavel para aceder a result[i]
+    mov     r3, #0
 
     ; r1:r0 -> 5423 = 0x152F
     mov     r0, #0x2F
@@ -231,7 +236,8 @@ main_for:
 
     ; rand_number == result[i]
     ldr     r5, result_addr
-    ldr     r7, [r5, r4]
+    add     r3, r4, r4 ; multiplica r3 por 2 para aceder ap result na posicao i
+    ldr     r7, [r5, r3]
     cmp     r0, r7
     beq     main_if_end
     
@@ -258,8 +264,9 @@ seed_addr:
     .data   ; variáveis globais
 result:
     .word   17747, 2055, 3664, 15611, 9816
+    ;.word  17747, 2055, 3664, 48379, 9816 array certo para nao dar erro
 seed:
-    .word   0x0000, 0x0001
+    .word   0x0001, 0x0000
     
     .stack
     .space  STACK_SIZE

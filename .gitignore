@@ -2,4 +2,4 @@
 *.hex
 *.lst
 *.exe
-shift-test.s
+*test*.s
